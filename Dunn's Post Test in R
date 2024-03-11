@@ -1,0 +1,23 @@
+setwd("")
+file2<-read.csv("INPUT.csv")
+
+#specify which columns possess which element. Here the first column is my “class” column which will be compared with each feature. The columns numbered 2 through 326 are all of my 325 individual features that will be tested with the Dunn test each individually. 
+colname1 <- names(file2)[1]
+colname2 <- names(file2)[2:597]
+
+#This is the formula for actually running the Dunn test on each feature in a batch mode. The “BH” (Benjamini and Hochberg) is the method of adjusting the p-value.  
+data2 <- lapply(colname2, function(x){rstatix::dunn_test(file2, reformulate(colname1, x), p.adjust.method = "BH")})
+
+#will give the output of the batch Dunn test performed above
+data2
+
+#save the output as a .txt file
+sink("RESULTS.csv")
+print(data2)
+sink()
+
+library(ggpubr)
+
+#this is for the comparison of groups, eg A, B, C
+my_comparisons <- list(c("A", "B"), c("B", "C"))
+ggboxplot(file2, x= "Class", y = "Feature.Area", color = "Class", palette= "jco")+stat_compare_means(comparisons=my_comparisons, test = "kruskal.test")+stat_compare_means(label.y = 50, method= "wilcox")
