@@ -1,0 +1,15 @@
+# only need to run following line if you don't have random forest package installed
+#install.packages("randomForest")
+library(randomForest)
+
+#setwd("your forlder the file is in")
+setwd("")
+file <- read.csv("inputdata_processed.csv")
+
+#removes first columnm with filenames
+working_df <- file[,-1]
+
+set.seed(5)
+RFmodel <- randomForest(as.factor(Category)~., data=working_df, importance=TRUE, ntree = 1000)
+
+RFmodel
